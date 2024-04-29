@@ -68,9 +68,11 @@ if(interactive()) {
 
         parts <- strsplit(file_path, "/")[[1]]
         for (i in seq_along(parts)) {
-            # Assume if .Rprofile exists we're in waR directory
-            if (!file.exists('.Rprofile') && (file.exists('DESCRIPTION') || dir.exists('.git'))) break
-            print(c(i, parts[[i]], file.exists('.Rprofile'), file.exists('DESCRIPTION'), dir.exists('.git')))
+            # File might be in waR root
+            if (!dir.exists(parts[[i]])) break
+
+            # Assume if Makefile.waR exists we're in waR directory
+            if (!file.exists('Makefile.waR')) break
             setwd(parts[[i]])
         }
         file_path <- do.call(file.path, as.list(parts[i:length(parts)]))
