@@ -50,6 +50,21 @@ if(interactive()) {
         (function () { camel <- 4 ; frog  <- 7 ; hijack(camel, ribbit = frog)  })()
     }
 
+    strl <- function(...) {
+        args <- if (...length() > 0) list(...) else as.list(parent.frame())
+        if (is.null(names(args))) names(args) <- rep("", length(args))
+
+        missing_args <- !nzchar(names(args))
+        # NB: Skip "strl" name
+        names(args)[missing_args] <- as.character(sys.call(0))[c(FALSE, missing_args)]
+
+        return(str(args))
+    }
+    if (FALSE) {
+        moo <- 5
+        strl(moo, "oink")
+    }
+
     psource <- function(file_path, environ = c(), ...) {
         senv <- function (e) {
             e <- split(e, !is.na(e))

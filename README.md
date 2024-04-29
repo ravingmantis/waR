@@ -64,6 +64,15 @@ hijack(baa = foo + bar + baz)
 NB: ``hijack()`` will not be available outside interactive sessions.
 This is intentional, so you don't accidentally release code containing ``hijack()`` commands.
 
+## strl()
+
+Similar to hijack, ``strl()`` wraps ``str()``, but puts all arguments in a list first.
+
+```r
+# Equivalent to str(list( moo = moo, oink = oink, baa = 4 + 5 ))
+strl(moo, oink, baa = 4 + 5)
+```
+
 ## psource()
 
 ``psource()`` is an imProved ``source()``. In addition to ``source()``'s capabilities, it will:
