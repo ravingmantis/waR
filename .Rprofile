@@ -93,7 +93,7 @@ if(interactive()) {
     }
 
     .First <- function () {
-        run_cmd <- function(cmd, echo = TRUE, hist_append = FALSE) {
+        run_cmd <- function(cmd, hist_append = FALSE) {
             if (isTRUE(hist_append)) {
                 # Write out history to temporary file
                 tmp_path <- tempfile("run_cmd")
@@ -109,7 +109,8 @@ if(interactive()) {
                 utils::loadhistory(tmp_path)
             }
 
-            if (isTRUE(echo)) writeLines(paste0("> ", cmd))
+            # NB: base::withAutoprint is nearly what we want, but doesn't parse strings
+            writeLines(paste0(getOption("prompt"), cmd))
             eval(parse(text = cmd))
         }
 
