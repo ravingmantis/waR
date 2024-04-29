@@ -76,7 +76,7 @@ if(interactive()) {
         file_path <- do.call(file.path, as.list(parts[i:length(parts)]))
 
         # Save command history in case script blows up R session
-        if (interactive()) utils::savehistory()
+        if (interactive()) utils::savehistory(.war_histfile)
 
         if (endsWith(file_path, ".Rmd")) {
             tmp_script <- tempfile(basename(file_path), fileext = ".R")
@@ -91,6 +91,9 @@ if(interactive()) {
         print.default(x);
         if (!identical(environment(x), globalenv())) str(as.list(environment(x)))
     }
+
+    .war_histfile <- normalizePath('.Rhistory', mustWork = TRUE)
+    writeLines(sprintf("R history saved to %s\n", .war_histfile))
 
     .First <- function () {
         run_cmd <- function(cmd, hist_append = FALSE) {
@@ -137,7 +140,7 @@ if(interactive()) {
                     # Inspired by utils::history
                     tmp_path <- tempfile("run_last")
                     on.exit(unlink(tmp_path), add = TRUE)
-                    utils::savehistory(tmp_path)
+                    utils::savehistory(tmp_path, .war_histfile)
 
                     utils::tail(readLines(tmp_path), 1)
                 }
@@ -157,6 +160,6 @@ if(interactive()) {
         }
     }
     .Last <- function() {
-        if (interactive()) utils::savehistory()
+        utils::savehistory(.war_histfile)
     }
 }
