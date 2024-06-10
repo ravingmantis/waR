@@ -158,7 +158,7 @@ if(interactive()) {
                 library(arg, character.only = TRUE, verbose = TRUE)
             } else if (fs::is_file(arg)) {
                 # File ==> Try to source it
-                psource(arg, echo = TRUE)
+                run_cmd(deparse1(call("psource", arg, echo = TRUE)), hist_append = TRUE)
             } else if (identical(arg, 'last')) {
                 # 'last' ==> Run last command in history
                 get_last <- function () {
