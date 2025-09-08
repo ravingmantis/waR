@@ -117,6 +117,9 @@ if(interactive()) {
             deparse.lines = 3 )
     }
 
+    
+    .war_histfile <- normalizePath('.Rhistory', mustWork = FALSE)
+    if (!file.exists(.war_histfile)) writeLines("", con = .war_histfile)
     .war_histfile <- normalizePath('.Rhistory', mustWork = TRUE)
     writeLines(sprintf("R history saved to %s\n", .war_histfile))
 
