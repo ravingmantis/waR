@@ -146,6 +146,13 @@ if(interactive()) {
         return(invisible(x))
     }
     
+    # Simultaneously send query and fetch rows
+    dbSlurp <- function (con, query, rows = 10) {
+        rs <- dbSendQuery(con, query)
+        on.exit(dbClearResult(rs), add = TRUE)
+        dbFetch(rs, rows)
+    }
+
     .war_histfile <- normalizePath('.Rhistory', mustWork = FALSE)
     if (!file.exists(.war_histfile)) writeLines("", con = .war_histfile)
     .war_histfile <- normalizePath('.Rhistory', mustWork = TRUE)
