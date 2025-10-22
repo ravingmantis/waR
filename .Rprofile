@@ -117,6 +117,8 @@ if(interactive()) {
             deparse.lines = 3 )
     }
 
+    # Force load to be verbose by default
+    load <- function (file, envir = parent.frame(), verbose = TRUE) base::load(file, envir = envir, verbose = verbose)
     
     .war_histfile <- normalizePath('.Rhistory', mustWork = FALSE)
     if (!file.exists(.war_histfile)) writeLines("", con = .war_histfile)
