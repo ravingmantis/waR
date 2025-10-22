@@ -105,7 +105,8 @@ if(interactive()) {
             knitr::purl(file_path, output = tmp_script)
             source(tmp_script, ...)
         } else {
-            source(file_path, ...)
+            options(unittest.stop_on_fail=TRUE)  # TODO: Better home for this?
+            unittest:::ut_with_report(source(file_path, ...))
         }
     }
 
