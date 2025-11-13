@@ -121,32 +121,6 @@ if(interactive()) {
     # Force load to be verbose by default
     load <- function (file, envir = parent.frame(), verbose = TRUE) base::load(file, envir = envir, verbose = verbose)
 
-    # Wrapper around pspg - https://github.com/okbob/pspg
-    pspg <- function (x) {
-        tmp_path <- tempfile(pattern = "pspg", fileext = ".csv")
-
-        if (is.data.frame(x)) {
-            tbl <- x
-        } else if (is.array(x)) {
-            tbl <- as.data.frame.table(x)
-        } else {
-            tbl <- as.data.frame(x)
-        }
-
-        write.csv(tbl, file = tmp_path)
-        on.exit(unlink(tmp_path), add = TRUE)
-
-        system2(c(
-            Sys.which("pspg"),
-            "--csv",
-            "--csv-header=on",
-            "--IGNORE-CASE",
-            tmp_path ))
-
-        cat("\n\n")
-        return(invisible(x))
-    }
-    
     # Simultaneously send query and fetch rows
     dbSlurp <- function (con, query, rows = 10) {
         rs <- dbSendQuery(con, query)
