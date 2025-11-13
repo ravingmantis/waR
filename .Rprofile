@@ -133,6 +133,9 @@ if(interactive()) {
     .war_histfile <- normalizePath('.Rhistory', mustWork = TRUE)
     writeLines(sprintf("R history saved to %s\n", .war_histfile))
 
+    options(tibble.print_max = 40)
+    options(tibble.width = Inf)
+
     .First <- function () {
         run_cmd <- function(cmd, hist_append = FALSE) {
             if (isTRUE(hist_append)) {
