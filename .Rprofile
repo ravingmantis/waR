@@ -99,6 +99,13 @@ if(interactive()) {
         old_wd <- getwd()
         on.exit(setwd(old_wd), add = TRUE, after = TRUE)
 
+        source_opts <- c(list(...), list(
+            echo = TRUE,
+            max.deparse.length = 1e6L,
+            width.cutoff = 1e6L,
+            deparseCtrl = "all" ))
+        source_opts <- source_opts[!duplicated(names(source_opts))]
+
         parts <- strsplit(file_path, "/")[[1]]
         for (i in seq_along(parts)) {
             # File might be in waR root
@@ -116,10 +123,10 @@ if(interactive()) {
         if (endsWith(file_path, ".Rmd")) {
             tmp_script <- tempfile(basename(file_path), fileext = ".R")
             knitr::purl(file_path, output = tmp_script)
-            source(tmp_script, ...)
+            do.call(source, c(list(tmp_script), source_opts))
         } else {
             options(unittest.stop_on_fail=TRUE)  # TODO: Better home for this?
-            unittest:::ut_with_report(source(file_path, ...))
+            unittest:::ut_with_report(do.call(source, c(list(file_path), source_opts)))
         }
     }
 
@@ -191,7 +198,7 @@ if(interactive()) {
                 library(arg, character.only = TRUE, verbose = TRUE)
             } else if (fs::is_file(arg)) {
                 # File ==> Try to source it
-                run_cmd(deparse1(call("psource", arg, echo = TRUE)), hist_append = TRUE)
+                run_cmd(deparse1(call("psource", arg)), hist_append = TRUE)
             } else if (identical(arg, 'last')) {
                 # 'last' ==> Run last command in history
                 get_last <- function () {
