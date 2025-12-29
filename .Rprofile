@@ -130,9 +130,8 @@ if(interactive()) {
         if (endsWith(file_path, ".Rmd")) {
             tmp_script <- tempfile(basename(file_path), fileext = ".R")
             knitr::purl(file_path, output = tmp_script)
-            do.call(source, c(list(tmp_script), source_opts))
+            unittest:::ut_with_report(do.call(source, c(list(tmp_script), source_opts)))
         } else {
-            options(unittest.stop_on_fail=TRUE)  # TODO: Better home for this?
             unittest:::ut_with_report(do.call(source, c(list(file_path), source_opts)))
         }
     }
@@ -162,6 +161,7 @@ if(interactive()) {
 
     options(tibble.print_max = 40)
     options(tibble.width = Inf)
+    options(unittest.stop_on_fail=TRUE)
 
     .First <- function () {
         run_cmd <- function(cmd, hist_append = FALSE) {
