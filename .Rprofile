@@ -103,8 +103,29 @@ if(interactive()) {
             options(r_options)
         }
 
-        old_wd <- getwd()
-        on.exit(setwd(old_wd), add = TRUE, after = TRUE)
+        if (is.character(file_path)) {
+            old_wd <- getwd()
+            on.exit(setwd(old_wd), add = TRUE, after = TRUE)
+
+            parts <- strsplit(file_path, "/")[[1]]
+            for (i in seq_along(parts)) {
+                # File might be in waR root
+                if (!dir.exists(parts[[i]])) break
+
+                # Assume if Makefile.waR exists we're in waR directory
+                if (!file.exists('Makefile.waR')) break
+                setwd(parts[[i]])
+            }
+            file_path <- do.call(file.path, as.list(parts[i:length(parts)]))
+
+            if (endsWith(file_path, ".Rmd")) {
+                tmp_script <- tempfile(basename(file_path), fileext = ".R")
+                knitr::purl(file_path, output = tmp_script)
+                file_path <- tmp_script
+            }
+        } else if (is.call(file_path)) {
+            file_path <- textConnection(deparse1(file_path, collapse = "\n"))
+        }
 
         source_opts <- c(list(...), list(
             echo = TRUE,
@@ -113,27 +134,10 @@ if(interactive()) {
             deparseCtrl = "all" ))
         source_opts <- source_opts[!duplicated(names(source_opts))]
 
-        parts <- strsplit(file_path, "/")[[1]]
-        for (i in seq_along(parts)) {
-            # File might be in waR root
-            if (!dir.exists(parts[[i]])) break
-
-            # Assume if Makefile.waR exists we're in waR directory
-            if (!file.exists('Makefile.waR')) break
-            setwd(parts[[i]])
-        }
-        file_path <- do.call(file.path, as.list(parts[i:length(parts)]))
-
         # Save command history in case script blows up R session
         if (interactive()) utils::savehistory(.war_histfile)
 
-        if (endsWith(file_path, ".Rmd")) {
-            tmp_script <- tempfile(basename(file_path), fileext = ".R")
-            knitr::purl(file_path, output = tmp_script)
-            unittest:::ut_with_report(do.call(source, c(list(tmp_script), source_opts)))
-        } else {
-            unittest:::ut_with_report(do.call(source, c(list(file_path), source_opts)))
-        }
+        unittest:::ut_with_report(do.call(source, c(list(file_path), source_opts)))
     }
 
     print.formula <- function (x, ...) {
