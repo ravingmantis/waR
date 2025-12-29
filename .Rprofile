@@ -203,13 +203,13 @@ if(interactive()) {
 
         # Act on each argument
         for (arg in commandArgs(trailingOnly = TRUE)) {
-            if (fs::is_dir(arg)) {
+            if (isTRUE(file.info(arg)$isdir)) {
                 if (file.exists(file.path(arg, "DESCRIPTION"))) {
                     run_cmd(substitute(
                         remotes::install_local(arg, force = TRUE, upgrade = "never"),
                         list( arg = arg )), r_options = list(warn = 2))
                 }
-            } else if (fs::is_file(arg)) {
+            } else if (file.exists(arg)) {
                 # File ==> Try to source it
                 run_cmd(call("psource", arg), hist_append = TRUE)
             } else if (identical(arg, 'last')) {
