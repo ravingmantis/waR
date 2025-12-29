@@ -204,6 +204,10 @@ if(interactive()) {
         # Act on each argument
         for (arg in commandArgs(trailingOnly = TRUE)) {
             if (isTRUE(file.info(arg)$isdir)) {
+                if (file.exists(file.path(arg, "renv.lock"))) {
+                    # Activate contained renv environment
+                    run_cmd(call("psource", file.path(arg, "renv", "activate.R"), echo = FALSE))
+                }
                 if (file.exists(file.path(arg, "DESCRIPTION"))) {
                     run_cmd(substitute(
                         remotes::install_local(arg, force = TRUE, upgrade = "never"),
