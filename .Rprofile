@@ -167,8 +167,12 @@ if(interactive()) {
             }
 
             # NB: base::withAutoprint is nearly what we want, but doesn't parse strings
-            writeLines(paste0(getOption("prompt"), cmd))
-            eval(parse(text = cmd))
+            source(
+                textConnection(cmd),
+                echo = TRUE,
+                max.deparse.length = 1e6L,
+                width.cutoff = 1e6L,
+                deparseCtrl = "all" )
         }
 
         # Run base::.First.sys now, so defaultPackages are attached.
