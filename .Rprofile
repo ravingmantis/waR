@@ -83,7 +83,7 @@ if(interactive()) {
         strl(moo, "oink")
     }
 
-    psource <- function(file_path, environ = c(), ...) {
+    psource <- function(file_path, environ = c(), r_options = list(), ...) {
         senv <- function (e) {
             e <- split(e, !is.na(e))
 
@@ -94,6 +94,13 @@ if(interactive()) {
             old_environ <- Sys.getenv(names(environ), unset = NA, names = TRUE)
             on.exit(senv(old_environ), add = TRUE, after = TRUE)
             senv(environ)
+        }
+
+        if (length(r_options) > 0) {
+            old_options <- options()[names(r_options)]
+            names(old_options) <- names(r_options)  # NB: unset options won't have a name, restore it
+            on.exit(options(old_options), add = TRUE, after = TRUE)
+            options(r_options)
         }
 
         old_wd <- getwd()
