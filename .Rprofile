@@ -33,8 +33,21 @@ if(interactive()) {
       if (!interactive()) q()
     }))
 
+    # See also: dump.frames()
     hijack <- function (...) {
-        args <- if (...length() > 0) list(...) else as.list(parent.frame())
+        if (...length() > 0) {
+            args <- list(...)
+        } else if (!identical(parent.frame(), globalenv())) {
+            # Dump environment of caller
+            args <- as.list(parent.frame())
+        } else if (length(sys.frames()) >= 3) {
+            # Parent is globalenv, not useful to dump probably called via options(error = hijack)
+            # First 2 are our machinery, want third
+            args <- as.list( tail(sys.frames(), 3)[[1]] )
+        } else {
+            args <- list()
+        }
+
         anames <- if (is.null(names(args))) rep("", length(args)) else names(args)
         for (i in seq_along(args)) {
             assign(
