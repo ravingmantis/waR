@@ -168,7 +168,9 @@ if(interactive()) {
     options(unittest.stop_on_fail=TRUE)
 
     .First <- function () {
-        run_cmd <- function(cmd, hist_append = FALSE) {
+        run_cmd <- function(cmd, hist_append = FALSE, ...) {
+            if (is.call(cmd)) cmd <- deparse1(cmd, collapse = "\n")
+
             if (isTRUE(hist_append)) {
                 # Write out history to temporary file
                 tmp_path <- tempfile("run_cmd")
@@ -185,12 +187,13 @@ if(interactive()) {
             }
 
             # NB: base::withAutoprint is nearly what we want, but doesn't parse strings
-            source(
+            psource(
                 textConnection(cmd),
                 echo = TRUE,
                 max.deparse.length = 1e6L,
                 width.cutoff = 1e6L,
-                deparseCtrl = "all" )
+                deparseCtrl = "all",
+                ... )
         }
 
         # Run base::.First.sys now, so defaultPackages are attached.
@@ -200,16 +203,15 @@ if(interactive()) {
 
         # Act on each argument
         for (arg in commandArgs(trailingOnly = TRUE)) {
-            old_warn <- getOption('warn')
             if (fs::is_dir(arg)) {
-                # Directory ==> Try to install it
-                options(warn = 2)
-                remotes::install_local(arg, force = TRUE, upgrade = "never")
-                options(warn = old_warn)
-                library(arg, character.only = TRUE, verbose = TRUE)
+                if (file.exists(file.path(arg, "DESCRIPTION"))) {
+                    run_cmd(substitute(
+                        remotes::install_local(arg, force = TRUE, upgrade = "never"),
+                        list( arg = arg )), r_options = list(warn = 2))
+                }
             } else if (fs::is_file(arg)) {
                 # File ==> Try to source it
-                run_cmd(deparse1(call("psource", arg)), hist_append = TRUE)
+                run_cmd(call("psource", arg), hist_append = TRUE)
             } else if (identical(arg, 'last')) {
                 # 'last' ==> Run last command in history
                 get_last <- function () {
@@ -228,7 +230,7 @@ if(interactive()) {
                 out <- call("Sys.setenv", m[[3]])
                 names(out)[[2]] <- m[[2]]
 
-                run_cmd(deparse1(out))
+                run_cmd(out)
             } else {
                 # Otherwise assume R code
                 run_cmd(arg, hist_append = TRUE)
