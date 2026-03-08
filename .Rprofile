@@ -40,9 +40,13 @@ if(interactive()) {
     .war_histfile <- normalizePath('.Rhistory', mustWork = TRUE)
     writeLines(sprintf("R history saved to %s\n", .war_histfile))
 
-    options(tibble.print_max = 40)
-    options(tibble.width = Inf)
-    options(unittest.stop_on_fail=TRUE)
+    options(
+        width = as.integer(strsplit(system2("stty", "size", stdout=TRUE), " ")[[1]])[[2]],
+        setWidthOnResize = TRUE,
+        tibble.print_max = 40,
+        tibble.width = Inf,
+        unittest.stop_on_fail=TRUE
+    )
 
     .First <- function () {
         run_cmd <- function(cmd, hist_append = FALSE, ...) {
