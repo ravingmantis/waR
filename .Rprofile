@@ -118,7 +118,7 @@ if(interactive()) {
             }
             file_path <- do.call(file.path, as.list(parts[i:length(parts)]))
 
-            if (endsWith(file_path, ".Rmd")) {
+            if (endsWith(file_path, ".Rmd") || endsWith(file_path, ".qmd")) {
                 tmp_script <- tempfile(basename(file_path), fileext = ".R")
                 knitr::purl(file_path, output = tmp_script)
                 file_path <- tmp_script
