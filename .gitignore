@@ -1,2 +1,4 @@
 # Ignore everything unless specifically added
 *
+!_war_scripts/
+!_war_scripts/*.R
