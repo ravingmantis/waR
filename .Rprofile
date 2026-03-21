@@ -202,16 +202,32 @@ if(interactive()) {
         base::.First.sys()
 
         # Act on each argument
+        renv_activated <- FALSE
         for (arg in commandArgs(trailingOnly = TRUE)) {
             if (isTRUE(file.info(arg)$isdir)) {
                 if (file.exists(file.path(arg, "renv.lock"))) {
                     # Activate contained renv environment
                     run_cmd(call("psource", file.path(arg, "renv", "activate.R"), echo = FALSE))
+                    renv_activated <- TRUE
                 }
                 if (file.exists(file.path(arg, "DESCRIPTION"))) {
-                    run_cmd(substitute(
-                        remotes::install_local(arg, force = TRUE, upgrade = "never"),
-                        list( arg = arg )), r_options = list(warn = 2))
+                    if (FALSE && isTRUE(renv_activated)) {
+                        run_cmd(substitute(
+                            renv::install(paste0("local::", arg), prompt = FALSE, dependencies = c()),
+                            list( arg = arg )), r_options = list(warn = 2))
+                    } else if (FALSE && requireNamespace("pak", quietly = TRUE)) {
+                        run_cmd(substitute(
+                            pak::local_install(arg, upgrade = FALSE, ask = FALSE, dependencies = FALSE),
+                            list( arg = arg )), r_options = list(warn = 2))
+                    } else if (FALSE && requireNamespace("remotes", quietly = TRUE)) {
+                        run_cmd(substitute(
+                            remotes::install_local(arg, force = TRUE, upgrade = "never"),
+                            list( arg = arg )), r_options = list(warn = 2))
+                    } else {
+                        run_cmd(substitute(
+                            utils::install.packages(arg, repos = NULL, dependencies = FALSE, verbose = TRUE),
+                            list( arg = arg )), r_options = list(warn = 2))
+                    }
                 }
             } else if (file.exists(arg)) {
                 # File ==> Try to source it
