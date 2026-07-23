@@ -2,7 +2,7 @@
 
 if(interactive()) {
     # https://stackoverflow.com/questions/1975110/printing-stack-trace-and-continuing-after-error-occurs-in-r
-    options(warn = 0, keep.source = TRUE, error = quote({
+    options(error = quote({
       # Debugging in R
       #   http://www.stats.uwo.ca/faculty/murdoch/software/debuggingR/index.shtml
       #
