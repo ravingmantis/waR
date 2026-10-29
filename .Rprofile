@@ -119,7 +119,7 @@ if(interactive()) {
                     # Inspired by utils::history
                     tmp_path <- tempfile("run_last")
                     on.exit(unlink(tmp_path), add = TRUE)
-                    utils::savehistory(tmp_path, .war_histfile)
+                    utils::savehistory(tmp_path)
 
                     utils::tail(readLines(tmp_path), 1)
                 }
