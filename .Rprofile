@@ -141,4 +141,10 @@ if(interactive()) {
     .Last <- function() {
         utils::savehistory(.war_histfile)
     }
+
+    # Save history after every top-level command, so it survives a crash
+    addTaskCallback(function (...) {
+        try(utils::savehistory(.war_histfile), silent = TRUE)
+        TRUE  # Returning TRUE keeps the callback registered
+    }, name = "war_savehistory")
 }
