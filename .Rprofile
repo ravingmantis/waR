@@ -144,8 +144,21 @@ if(interactive()) {
     }
 
     # Save history after every top-level command, so it survives a crash
-    addTaskCallback(function (...) {
-        try(utils::savehistory(.war_histfile), silent = TRUE)
+    # Multi-line commands are merged into one line first, see hist_merge()
+    invisible(addTaskCallback(function (...) {
+        try({
+            tmp_path <- tempfile("hist_merge")
+            on.exit(unlink(tmp_path), add = TRUE)
+            utils::savehistory(tmp_path)
+
+            lines <- readLines(tmp_path)
+            merged <- hist_merge(lines)
+            if (!identical(merged, lines)) {
+                writeLines(merged, tmp_path)
+                utils::loadhistory(tmp_path)
+            }
+            utils::savehistory(.war_histfile)
+        }, silent = TRUE)
         TRUE  # Returning TRUE keeps the callback registered
-    }, name = "war_savehistory")
+    }, name = "war_savehistory"))
 }
