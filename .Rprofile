@@ -43,6 +43,7 @@ if(interactive()) {
     options(
         width = as.integer(strsplit(system2("stty", "size", stdout=TRUE), " ")[[1]])[[2]],
         setWidthOnResize = TRUE,
+        continue = "\001\033[48;5;238m\002 \001\033[0m\002 ",  # Shaded block, copy-pastes as spaces
         tibble.print_max = 40,
         tibble.width = Inf,
         unittest.stop_on_fail=TRUE

@@ -49,6 +49,7 @@ psource <- function(file_path, environ = c(), r_options = list(), ...) {
 
     source_opts <- c(list(...), list(
         echo = TRUE,
+        continue.echo = "  ",  # NB: Don't echo ANSI codes from getOption("continue")
         max.deparse.length = 1e6L,
         width.cutoff = 1e6L,
         deparseCtrl = "all" ))
