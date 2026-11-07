@@ -18,8 +18,6 @@ psource <- function(file_path, environ = c(), r_options = list(), ...) {
         options(r_options)
     }
 
-    as_ut_script <- FALSE
-
     if (is.character(file_path)) {
         old_wd <- getwd()
         on.exit(setwd(old_wd), add = TRUE, after = TRUE)
@@ -40,9 +38,6 @@ psource <- function(file_path, environ = c(), r_options = list(), ...) {
             knitr::purl(file_path, output = tmp_script)
             file_path <- tmp_script
         }
-        if (endsWith(file_path, ".R")) {
-            as_ut_script <- TRUE
-        }
     } else if (is.call(file_path)) {
         file_path <- textConnection(deparse1(file_path, collapse = "\n"))
     }
@@ -58,10 +53,6 @@ psource <- function(file_path, environ = c(), r_options = list(), ...) {
     # Save command history in case script blows up R session
     if (interactive()) utils::savehistory(.war_histfile)
 
-    if (as_ut_script) {
-        out <- unittest:::ut_with_report(do.call(source, c(list(file_path), source_opts)))
-    } else {
-        out <- do.call(source, c(list(file_path), source_opts))
-    }
-    return(out)
+    out <- do.call(source, c(list(file_path), source_opts))
+    return(invisible(out))
 }
